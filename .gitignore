@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Uploaded and generated images (user data, not source code)
+uploads/*
+outputs/*
+!uploads/.gitkeep
+!outputs/.gitkeep
+
+# Model weights (large binary files)
+weights/*.h5
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
