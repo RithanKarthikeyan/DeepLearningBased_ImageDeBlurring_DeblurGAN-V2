@@ -20,3 +20,6 @@ weights/*.h5
 # OS files
 .DS_Store
 Thumbs.db
+
+evaluation/output/*
+!evaluation/output/.gitkeep
