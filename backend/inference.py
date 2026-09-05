@@ -12,7 +12,7 @@ import numpy as np
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
 DEBLURGAN_DIR = PROJECT_ROOT / "deblurganv2"
-WEIGHTS_PATH = PROJECT_ROOT / "weights" / "fpn_mobilenet.h5"
+WEIGHTS_PATH = PROJECT_ROOT / "weights" / "fpn_inception.h5"
 
 sys.path.insert(0, str(DEBLURGAN_DIR))
 

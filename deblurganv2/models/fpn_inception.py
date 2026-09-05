@@ -91,7 +91,8 @@ class FPN(nn.Module):
         """
 
         super().__init__()
-        self.inception = inceptionresnetv2(num_classes=1000, pretrained='imagenet')
+        #self.inception = inceptionresnetv2(num_classes=1000, pretrained='imagenet')
+        self.inception = inceptionresnetv2(num_classes=1000, pretrained=None)
 
         self.enc0 = self.inception.conv2d_1a
         self.enc1 = nn.Sequential(
