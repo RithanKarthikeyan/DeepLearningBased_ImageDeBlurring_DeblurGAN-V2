@@ -80,7 +80,25 @@ class FPNInception(nn.Module):
 
         return torch.clamp(res, min = -1,max = 1)
 
+class SelfAttention(nn.Module):
+    def __init__(self, in_channels, reduction=8):
+        super().__init__()
+        reduced = max(in_channels // reduction, 1)
+        self.query_conv = nn.Conv2d(in_channels, reduced, kernel_size=1)
+        self.key_conv   = nn.Conv2d(in_channels, reduced, kernel_size=1)
+        self.value_conv = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+        self.gamma = nn.Parameter(torch.zeros(1))
+        self.softmax = nn.Softmax(dim=-1)
 
+    def forward(self, x):
+        B, C, H, W = x.shape
+        N = H * W
+        q = self.query_conv(x).view(B, -1, N).permute(0, 2, 1)
+        k = self.key_conv(x).view(B, -1, N)
+        v = self.value_conv(x).view(B, -1, N)
+        attn = self.softmax(torch.bmm(q, k))
+        out = torch.bmm(v, attn.permute(0, 2, 1)).view(B, C, H, W)
+        return self.gamma * out + x
 class FPN(nn.Module):
 
     def __init__(self, norm_layer, num_filters=256):
@@ -125,6 +143,7 @@ class FPN(nn.Module):
                                  nn.ReLU(inplace=True))
         self.pad = nn.ReflectionPad2d(1)
         self.lateral4 = nn.Conv2d(2080, num_filters, kernel_size=1, bias=False)
+        self.attn4 = SelfAttention(num_filters)
         self.lateral3 = nn.Conv2d(1088, num_filters, kernel_size=1, bias=False)
         self.lateral2 = nn.Conv2d(192, num_filters, kernel_size=1, bias=False)
         self.lateral1 = nn.Conv2d(64, num_filters, kernel_size=1, bias=False)
@@ -152,7 +171,7 @@ class FPN(nn.Module):
 
         # Lateral connections
 
-        lateral4 = self.pad(self.lateral4(enc4))
+        lateral4 = self.pad(self.attn4(self.lateral4(enc4)))
         lateral3 = self.pad(self.lateral3(enc3))
         lateral2 = self.lateral2(enc2)
         lateral1 = self.pad(self.lateral1(enc1))
